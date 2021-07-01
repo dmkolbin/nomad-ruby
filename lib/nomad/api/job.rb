@@ -40,6 +40,23 @@ module Nomad
       return JobCreate.decode(json)
     end
 
+    # Update existing job. The contents can be a string
+    # or a hash.
+    #
+    # @param [String] name The job name (ID).
+    #
+    # @param [String] contents
+    #   the raw JSON contents
+    # @param [Hash] contents
+    #   a hash of the contents to convert to JSON
+    #
+    # @return [JobEval]
+    def update(name, contents, **options)
+      body = contents.is_a?(Hash) ? JSON.fast_generate(contents) : contents
+      json = client.post("/v1/jobs/#{CGI.escape(name)}", body, options)
+      return JobEval.decode(json)
+    end
+
     # Reads the job with the given name.
     #
     # @param [String] name The job name (ID).
@@ -75,6 +92,26 @@ module Nomad
       body = contents.is_a?(Hash) ? JSON.fast_generate(contents) : contents
       json = client.post("/v1/job/#{CGI.escape(name)}/plan", body, options)
       return JobPlan.decode(json)
+    end
+
+    # Stop the job with the given name.
+    #
+    # @param [String] name The job name (ID).
+    #
+    # @return [JobEval]
+    def stop(name, **options)
+      json = client.delete("/v1/job/#{CGI.escape(name)}", options)
+      return JobEval.decode(json)
+    end
+
+    # List job allocations.
+    #
+    # @param [String] name The job name (ID).
+    #
+    # @return [Array<Alloc>]
+    def allocations(name, **options)
+      json = client.get("/v1/job/#{CGI.escape(name)}/allocations", options)
+      return json.map { |item| Alloc.decode(item) }
     end
   end
 
@@ -434,6 +471,23 @@ module Nomad
     #   The job known_leader.
     #   @return [Boolean]
     field :KnownLeader, as: :known_leader
+  end
+
+  class JobEval < Response
+    # @!attribute [r] eval_id
+    #   The job eval_id.
+    #   @return [String]
+    field :EvalID, as: :eval_id, load: :string_as_nil
+
+    # @!attribute [r] eval_create_index
+    #   The job eval_create_index.
+    #   @return [Integer]
+    field :EvalCreateIndex, as: :eval_create_index
+
+    # @!attribute [r] job_modify_index
+    #   The job job_modify_index.
+    #   @return [Integer]
+    field :JobModifyIndex, as: :job_modify_index
   end
 
   class JobVersion < Response
