@@ -32,6 +32,16 @@ module Nomad
       json = client.get("/v1/allocation/#{CGI.escape(id)}", options)
       return Alloc.decode(json)
     end
+
+    # Stop a specific allocation.
+    #
+    # @param [String] id The full ID of the allocation to read
+    #
+    # @return [EvalAlloc]
+    def stop(id, **options)
+      json = client.post("/v1/allocation/#{CGI.escape(id)}/stop", options)
+      return EvalAlloc.decode(json)
+    end
   end
 
   class DeploymentStatus < Response
@@ -247,5 +257,17 @@ module Nomad
     #   The number of coalesced failures
     #   @return [Integer]
     field :CoalescedFailures, as: :coalesced_failures
+  end
+
+  class EvalAlloc < Response
+    # @!attribute [r] eval_id
+    #   The alloc eval_id.
+    #   @return [String]
+    field :EvalID, as: :eval_id, load: :string_as_nil
+
+    # @!attribute [r] index
+    #   The alloc index.
+    #   @return [Integer]
+    field :Index, as: :index
   end
 end
