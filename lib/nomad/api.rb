@@ -11,5 +11,6 @@ module Nomad
     require_relative "api/status"
     require_relative "api/system"
     require_relative "api/validate"
+    require_relative "api/volume"
   end
 end
