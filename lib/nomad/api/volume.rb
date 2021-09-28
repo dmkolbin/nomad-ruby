@@ -145,6 +145,9 @@ module Nomad
     field :Allocations, as: :allocations, load: ->(item) { (item || []).map { |a| Alloc.decode(a) } }
     field :ReadAllocs, as: :read_allocs
     field :WriteAllocs, as: :write_allocs
+    field :Capacity, as: :capacity
+    field :CloneID, as: :clone_id
+    field :Context, as: :context
   end
 
   class VolumeRequestedCapabilities < Response
