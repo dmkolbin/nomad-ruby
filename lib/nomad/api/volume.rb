@@ -147,11 +147,16 @@ module Nomad
     field :WriteAllocs, as: :write_allocs
     field :Capacity, as: :capacity
     field :CloneID, as: :clone_id
-    field :Context, as: :context
+    field :Context, as: :context, load: ->(item) { VolumeContext.decode(item) }
   end
 
   class VolumeRequestedCapabilities < Response
     field :AccessMode, as: :access_mode, load: :string_as_nil
     field :AttachmentMode, as: :attachment_mode, load: :string_as_nil
+  end
+
+  class VolumeContext < Response
+    field :Share, as: :share, load: :string_as_nil
+    field :Server, as: :server, load: :string_as_nil
   end
 end
